@@ -23,6 +23,8 @@ export interface AppRouterProps {
   NotFoundComponent?: React.ComponentType | React.ReactElement;
   onAppEnter?: (appConfig: CompatibleAppConfig) => void;
   onAppLeave?: (appConfig: CompatibleAppConfig) => void;
+  onLoadingApp?: (appConfig: CompatibleAppConfig) => void;
+  onFinishLoading?: (appConfig: CompatibleAppConfig) => void;
   shouldAssetsRemove?: (
     assetUrl?: string,
     element?: HTMLElement | HTMLLinkElement | HTMLStyleElement | HTMLScriptElement,
@@ -66,6 +68,8 @@ export default class AppRouter extends React.Component<AppRouterProps, AppRouter
     shouldAssetsRemove: () => true,
     onAppEnter: () => {},
     onAppLeave: () => {},
+    onLoadingApp: () => {},
+    onFinishLoading: () => {},
     basename: '',
     fetch: defaultFetch,
   };
@@ -140,13 +144,19 @@ export default class AppRouter extends React.Component<AppRouterProps, AppRouter
   loadingApp = (app: AppConfig) => {
     if (this.unmounted) return;
     this.setState({ appLoading: app.name });
+
+    const { onLoadingApp } = this.props;
+    onLoadingApp(app);
   }
 
   finishLoading = (app: AppConfig) => {
     if (this.unmounted) return;
     const { appLoading } = this.state;
+    const { onFinishLoading } = this.props;
     if (appLoading === app.name) {
       this.setState({ appLoading: '' });
+
+      onFinishLoading(app);
     }
   }
 
